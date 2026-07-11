@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Judy — QR Pet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F4E4DC;
+      --purple: #D9D3FF;
+      --card: #FFFFFF;
+      --accent: #FF6B4A;
+      --accent-shadow: rgba(255, 107, 74, 0.3);
+      --text: #1E1E1E;
+      --text-sec: #7A7A7A;
+      --chip-bg: #F7F7F7;
+      --border: #ECECEC;
+      --radius-card: 28px;
+      --radius-chip: 14px;
+      --radius-btn: 20px;
+      --transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      justify-content: center;
+    }
+
+    .phone {
+      width: 100%;
+      max-width: 480px;
+      height: 100vh;
+      height: 100dvh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+
+    /* ── Header ── */
+    .header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+    }
+
+    .header-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .header-btn:active {
+      transform: scale(0.92);
+    }
+
+    .header-btn svg {
+      width: 20px;
+      height: 20px;
+      color: var(--text);
+    }
+
+    .header-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* ── Purple Zone ── */
+    .hero {
+      flex-shrink: 0;
+      height: 42vh;
+      min-height: 300px;
+      background: var(--purple);
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-img {
+      width: 200px;
+      height: auto;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(30px);
+      filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.12));
+    }
+
+    .hero-img.visible {
+      animation: heroIn 0.7s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Decorative elements */
+    .deco {
+      position: absolute;
+      font-size: 20px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .deco.visible {
+      animation: decoFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .deco-1 { top: 18%; left: 8%; animation-delay: 0.4s; font-size: 16px; }
+    .deco-2 { top: 12%; right: 12%; animation-delay: 0.6s; font-size: 14px; }
+    .deco-3 { top: 28%; left: 22%; animation-delay: 0.5s; font-size: 22px; }
+    .deco-4 { top: 8%; right: 30%; animation-delay: 0.7s; font-size: 14px; }
+    .deco-5 { top: 22%; right: 8%; animation-delay: 0.55s; font-size: 16px; }
+    .deco-6 { top: 35%; left: 10%; animation-delay: 0.65s; font-size: 13px; }
+
+    .deco.visible.floating {
+      animation: decoFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards, floatY 3s ease-in-out infinite;
+    }
+
+    .deco-1.visible.floating { animation-delay: 0.4s, 0.4s; }
+    .deco-2.visible.floating { animation-delay: 0.6s, 0.8s; }
+    .deco-3.visible.floating { animation-delay: 0.5s, 1.2s; }
+    .deco-4.visible.floating { animation-delay: 0.7s, 0.6s; }
+    .deco-5.visible.floating { animation-delay: 0.55s, 1s; }
+    .deco-6.visible.floating { animation-delay: 0.65s, 1.4s; }
+
+    /* ── White Card ── */
+    .card {
+      flex: 1;
+      background: var(--card);
+      border-radius: var(--radius-card) var(--radius-card) 0 0;
+      margin-top: -28px;
+      position: relative;
+      z-index: 5;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 28px 24px 32px;
+      opacity: 0;
+      transform: translateY(20px);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .card.visible {
+      animation: cardIn 0.6s 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .card::-webkit-scrollbar {
+      display: none;
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .card-header h1 {
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .card-header .location {
+      font-size: 14px;
+      color: var(--text-sec);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .card-header .location svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      color: var(--accent);
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: 24px;
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-sec);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    /* ── Chips ── */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--chip-bg);
+      border-radius: var(--radius-chip);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: background var(--transition), transform var(--transition);
+      cursor: default;
+    }
+
+    .chip.visible {
+      animation: chipIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .chip:hover {
+      background: #EDEDED;
+    }
+
+    .chip:active {
+      transform: scale(0.95) !important;
+    }
+
+    .chip-icon {
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    /* ── Description ── */
+    .desc-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .desc-text {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text-sec);
+    }
+
+    /* ── Alert Box ── */
+    .alert-box {
+      background: #FFF8F6;
+      border: 1px solid #FFE8E2;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+
+    .alert-box .alert-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .alert-box ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .alert-box li {
+      font-size: 13px;
+      color: var(--text-sec);
+      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .alert-box li::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      opacity: 0.5;
+    }
+
+    .help-box {
+      background: #F6FAFF;
+      border: 1px solid #E0ECFF;
+    }
+
+    .help-box .alert-title {
+      color: #4A7DFF;
+    }
+
+    .help-box li::before {
+      background: #4A7DFF;
+    }
+
+    /* ── CTA Button ── */
+    .cta-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      height: 58px;
+      background: var(--accent);
+      color: #FFFFFF;
+      border: none;
+      border-radius: var(--radius-btn);
+      font-family: 'Poppins', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      margin-top: 8px;
+      box-shadow: 0 12px 30px var(--accent-shadow);
+      transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+    }
+
+    .cta-btn:hover {
+      background: #FF5A36;
+      box-shadow: 0 16px 40px rgba(255, 107, 74, 0.35);
+    }
+
+    .cta-btn:active {
+      transform: scale(0.97);
+      background: #E84D2D;
+    }
+
+    .cta-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ── Footer ── */
+    .card-footer {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-footer p {
+      font-size: 12px;
+      color: var(--text-sec);
+      opacity: 0.6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .card-footer p svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    /* ── Animations ── */
+    @keyframes heroIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes cardIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes chipIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes decoFade {
+      to {
+        opacity: 0.6;
+      }
+    }
+
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--text);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 22px;
+      border-radius: 100px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transition: opacity 250ms ease, transform 250ms ease;
+      z-index: 999;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Safe area for notched phones ── */
+    @supports (padding-top: env(safe-area-inset-top)) {
+      .header {
+        padding-top: calc(14px + env(safe-area-inset-top));
+      }
+      .card {
+        padding-bottom: calc(32px + env(safe-area-inset-bottom));
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+
+    <!-- Header -->
+    <div class="header">
+      <button class="header-btn" aria-label="Volver" id="backBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="header-title">Details</span>
+      <button class="header-btn" aria-label="Más opciones">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <!-- Purple Zone -->
+    <div class="hero">
+      <span class="deco deco-1">⭐</span>
+      <span class="deco deco-2">✨</span>
+      <span class="deco deco-3">🐾</span>
+      <span class="deco deco-4">✨</span>
+      <span class="deco deco-5">⭐</span>
+      <span class="deco deco-6">🐾</span>
+      <img class="hero-img" id="heroImg" src="PETimg/chuni.png" alt="Foto de Judy">
+    </div>
+
+    <!-- White Card -->
+    <div class="card" id="card">
+
+      <div class="card-header">
+        <h1>Judy</h1>
+        <p class="location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Esperanza, Santa Fe
+        </p>
+      </div>
+
+      <!-- Pet Attributes -->
+      <div class="section">
+        <div class="section-label">Pet Attributes</div>
+        <div class="chips" id="chips">
+          <span class="chip" data-delay="0"><span class="chip-icon">🐕</span> Perra</span>
+          <span class="chip" data-delay="1"><span class="chip-icon">📍</span> Esperanza</span>
+          <span class="chip" data-delay="2"><span class="chip-icon">❤️</span> Cariñosa</span>
+          <span class="chip" data-delay="3"><span class="chip-icon">🔍</span> Curiosa</span>
+          <span class="chip" data-delay="4"><span class="chip-icon">✅</span> Tiene QR</span>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="section">
+        <div class="section-label desc-title">Sobre Judy</div>
+        <p class="desc-text">
+          Judy es una perra muy juguetona, cariñosa y curiosa. Le encanta correr, perseguir pelotas y recibir mimos de cualquier persona amable.
+        </p>
+
+        <div class="alert-box">
+          <div class="alert-title">⚠️ Me asustan</div>
+          <ul>
+            <li>Tormentas</li>
+            <li>Fuegos artificiales</li>
+            <li>Ruidos muy fuertes</li>
+          </ul>
+        </div>
+
+        <div class="alert-box help-box" style="margin-top: 10px;">
+          <div class="alert-title">💛 Cómo ayudarme</div>
+          <ul>
+            <li>Hablame con calma</li>
+            <li>No me persigas</li>
+            <li>Ofreceme agua</li>
+            <li>Llamá a mi dueño</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <a href="https://wa.me/543496578813?text=Hola.%20Encontr%C3%A9%20a%20Judy%20y%20quer%C3%ADa%20avisarte%20d%C3%B4nde%20est%C3%A1."
+         class="cta-btn"
+         id="ctaBtn"
+         target="_blank"
+         rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        🐾 Contactar al dueño
+      </a>
+
+      <div class="card-footer">
+        <p>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Escaneá el QR para volver a ver esta ficha
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+
+      // ── Entrance animations ──
+      var heroImg = document.getElementById('heroImg');
+      var card = document.getElementById('card');
+      var decos = document.querySelectorAll('.deco');
+      var chips = document.querySelectorAll('.chip');
+
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          heroImg.classList.add('visible');
+          card.classList.add('visible');
+
+          decos.forEach(function (d) {
+            d.classList.add('visible');
+            setTimeout(function () { d.classList.add('floating'); }, 800);
+          });
+
+          chips.forEach(function (chip) {
+            var delay = parseInt(chip.getAttribute('data-delay'), 10);
+            setTimeout(function () {
+              chip.classList.add('visible');
+            }, 400 + delay * 100);
+          });
+        });
+      });
+
+      // ── Back button ──
+      document.getElementById('backBtn').addEventListener('click', function () {
+        if (window.history.length > 1) {
+          window.history.back();
+        }
+      });
+
+      // ── Copy address ──
+      var chipsEl = document.getElementById('chips');
+      if (chipsEl) {
+        chipsEl.addEventListener('click', function (e) {
+          var chip = e.target.closest('.chip');
+          if (!chip) return;
+          var text = chip.textContent.trim();
+          if (text.indexOf('Esperanza') !== -1 && navigator.clipboard) {
+            navigator.clipboard.writeText('Córdoba 2248, Esperanza, Santa Fe').then(function () {
+              showToast('Dirección copiada');
+            });
+          }
+        });
+      }
+
+      // ── Toast ──
+      var toastEl = null;
+      var toastTimer = null;
+
+      function showToast(msg) {
+        if (toastEl) toastEl.remove();
+        clearTimeout(toastTimer);
+
+        toastEl = document.createElement('div');
+        toastEl.className = 'toast';
+        toastEl.textContent = msg;
+        document.body.appendChild(toastEl);
+
+        requestAnimationFrame(function () {
+          toastEl.classList.add('show');
+        });
+
+        toastTimer = setTimeout(function () {
+          toastEl.classList.remove('show');
+          setTimeout(function () {
+            if (toastEl) toastEl.remove();
+            toastEl = null;
+          }, 300);
+        }, 2000);
+      }
+
+    })();
+  </script>
+
+</body>
+</html>
